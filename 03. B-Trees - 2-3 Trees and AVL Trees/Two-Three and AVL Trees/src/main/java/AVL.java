@@ -7,13 +7,45 @@ public class AVL<T extends Comparable<T>> {
         return this.root;
     }
 
-    public boolean contains(T item) {
-        Node<T> node = this.search(this.root, item);
+    public void insert(T value) {
+        this.root = this.insert(this.root, value);
+    }
+
+    public Node<T> insert(Node<T> node, T value) {
+        if (node == null) {
+            return new Node<>(value);
+        }
+
+        int compareNumber = value.compareTo(node.value);
+        if (compareNumber < 0) {
+            node.left = insert(node.left, value);
+        } else if (compareNumber > 0) {
+            node.right = insert(node.right, value);
+        }
+
+        updateHeight(node);
+        node = balance(node);
+        return node;
+    }
+
+    public boolean contains(T key) {
+        Node<T> node = this.contains(this.root, key);
         return node != null;
     }
 
-    public void insert(T item) {
-        this.root = this.insert(this.root, item);
+    public Node<T> contains(Node<T> root, T key) {
+        if (root == null) {
+            return null;
+        }
+
+        int compareNumber = key.compareTo(root.value);
+        if (compareNumber < 0) {
+            return contains(root.left, key);
+        } else if (compareNumber > 0) {
+            return contains(root.right, key);
+        }
+
+        return root;
     }
 
     public void eachInOrder(Consumer<T> consumer) {
@@ -30,31 +62,55 @@ public class AVL<T extends Comparable<T>> {
         this.eachInOrder(node.right, action);
     }
 
-    private Node<T> insert(Node<T> node, T item) {
+    private int height(Node<T> node) {
         if (node == null) {
-            return new Node<>(item);
+            return 0;
         }
 
-        int cmp = item.compareTo(node.value);
-        if (cmp < 0) {
-            node.left = this.insert(node.left, item);
-        } else if (cmp > 0) {
-            node.right = this.insert(node.right, item);
-        }
-
-        return node;
+        return node.height;
     }
 
-    private Node<T> search(Node<T> node, T item) {
-        if (node == null) {
-            return null;
-        }
+    private void updateHeight(Node<T> node) {
+        node.height = Math.max(height(node.left), height(node.right)) + 1;
+    }
 
-        int cmp = item.compareTo(node.value);
-        if (cmp < 0) {
-            return search(node.left, item);
-        } else if (cmp > 0) {
-            return search(node.right, item);
+    private Node<T> rotateLeft(Node<T> node) {
+        Node<T> right = node.right;
+        node.right = right.left;
+        right.left = node;
+
+        this.updateHeight(node);
+        this.updateHeight(right);
+
+        return right;
+    }
+
+    private Node<T> rotateRight(Node<T> node) {
+        Node<T> left = node.left;
+        node.left = node.left.right;
+        left.right = node;
+
+        this.updateHeight(node);
+        this.updateHeight(left);
+
+        return left;
+    }
+
+    private Node<T> balance(Node<T> node) {
+        int balance = this.height(node.left) - this.height(node.right);
+
+        if (balance < -1) {
+            int childBalance = this.height(node.right.left) - this.height(node.right.right);
+            if (childBalance > 0) {
+                node.right = rotateRight(node.right);
+            }
+            return rotateLeft(node);
+        } else if (balance > 1) {
+            int childBalance = this.height(node.left.left) - this.height(node.left.right);
+            if (childBalance < 0) {
+              node.left = this.rotateRight(node.left);
+            }
+            return this.rotateRight(node);
         }
 
         return node;

@@ -10,6 +10,13 @@
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="MavenImportPreferences">
+    <option name="generalSettings">
+      <MavenGeneralSettings>
+        <option name="useMavenConfig" value="true" />
+      </MavenGeneralSettings>
+    </option>
+  </component>
   <component name="ProjectId" id="2XtRpXDslCCKKZFzpW0QaMGhGiP" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -20,6 +27,7 @@
     "RunOnceActivity.OpenProjectViewOnStart": "true",
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
+    "last_opened_file_path": "D:/Programming/Projects/Java Data Structures Fundamentals/03. Trees Representation and Traversal (BFS and DFS)/Lab/Tree",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -62,6 +70,16 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="AVLTest.traverseInOrder_AfterSingleInsert" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="Data-Structures-Advanced-B-2-3-AVL-Trees" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="AVLTest" />
+      <option name="METHOD_NAME" value="traverseInOrder_AfterSingleInsert" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration default="true" type="JetRunConfigurationType">
       <module name="Two-Three and AVL Trees" />
       <method v="2">
@@ -78,6 +96,7 @@
     <recent_temporary>
       <list>
         <item itemvalue="JUnit.AVLTest" />
+        <item itemvalue="JUnit.AVLTest.traverseInOrder_AfterSingleInsert" />
         <item itemvalue="Application.Main (1)" />
         <item itemvalue="Application.Main" />
       </list>
@@ -92,6 +111,7 @@
       <option name="presentableId" value="Default" />
       <updated>1699446575229</updated>
       <workItem from="1699446576371" duration="1107000" />
+      <workItem from="1699536906284" duration="11285000" />
     </task>
     <servers />
   </component>
