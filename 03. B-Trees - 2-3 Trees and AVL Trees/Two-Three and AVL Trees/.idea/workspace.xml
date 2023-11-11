@@ -22,24 +22,24 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "RunOnceActivity.OpenProjectViewOnStart": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "D:/Programming/Projects/Java Data Structures Fundamentals/03. Trees Representation and Traversal (BFS and DFS)/Lab/Tree",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "project.structure.last.edited": "Project",
-    "project.structure.proportion": "0.0",
-    "project.structure.side.proportion": "0.0",
-    "settings.editor.selected.configurable": "preferences.lookFeel",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;RunOnceActivity.OpenProjectViewOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;WebServerToolWindowFactoryState&quot;: &quot;false&quot;,
+    &quot;last_opened_file_path&quot;: &quot;D:/Programming/Projects/Java Data Structures Fundamentals/03. Trees Representation and Traversal (BFS and DFS)/Lab/Tree&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;project.structure.last.edited&quot;: &quot;Project&quot;,
+    &quot;project.structure.proportion&quot;: &quot;0.0&quot;,
+    &quot;project.structure.side.proportion&quot;: &quot;0.0&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.lookFeel&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
   }
-}]]></component>
+}</component>
   <component name="RunManager" selected="JUnit.AVLTest">
     <configuration name="Main (1)" type="Application" factoryName="Application" temporary="true" nameIsGenerated="true">
       <option name="MAIN_CLASS_NAME" value="Main" />
@@ -70,6 +70,16 @@
         <option name="Make" enabled="true" />
       </method>
     </configuration>
+    <configuration name="AVLTest.rebalance_SingleLeft" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
+      <module name="Data-Structures-Advanced-B-2-3-AVL-Trees" />
+      <option name="PACKAGE_NAME" value="" />
+      <option name="MAIN_CLASS_NAME" value="AVLTest" />
+      <option name="METHOD_NAME" value="rebalance_SingleLeft" />
+      <option name="TEST_OBJECT" value="method" />
+      <method v="2">
+        <option name="Make" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="AVLTest.traverseInOrder_AfterSingleInsert" type="JUnit" factoryName="JUnit" temporary="true" nameIsGenerated="true">
       <module name="Data-Structures-Advanced-B-2-3-AVL-Trees" />
       <option name="PACKAGE_NAME" value="" />
@@ -96,8 +106,9 @@
     <recent_temporary>
       <list>
         <item itemvalue="JUnit.AVLTest" />
-        <item itemvalue="JUnit.AVLTest.traverseInOrder_AfterSingleInsert" />
         <item itemvalue="Application.Main (1)" />
+        <item itemvalue="JUnit.AVLTest.rebalance_SingleLeft" />
+        <item itemvalue="JUnit.AVLTest.traverseInOrder_AfterSingleInsert" />
         <item itemvalue="Application.Main" />
       </list>
     </recent_temporary>
@@ -112,6 +123,11 @@
       <updated>1699446575229</updated>
       <workItem from="1699446576371" duration="1107000" />
       <workItem from="1699536906284" duration="11285000" />
+      <workItem from="1699616499127" duration="9941000" />
+      <workItem from="1699643071728" duration="4195000" />
+      <workItem from="1699653501239" duration="169000" />
+      <workItem from="1699711685652" duration="3420000" />
+      <workItem from="1699728954505" duration="371000" />
     </task>
     <servers />
   </component>

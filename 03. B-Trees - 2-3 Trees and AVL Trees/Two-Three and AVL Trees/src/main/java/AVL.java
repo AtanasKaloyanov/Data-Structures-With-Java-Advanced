@@ -28,6 +28,18 @@ public class AVL<T extends Comparable<T>> {
         return node;
     }
 
+    private void updateHeight(Node<T> node) {
+        node.height = Math.max(height(node.left), height(node.right)) + 1;
+    }
+
+    private int height(Node<T> node) {
+        if (node == null) {
+            return 0;
+        }
+
+        return node.height;
+    }
+
     public boolean contains(T key) {
         Node<T> node = this.contains(this.root, key);
         return node != null;
@@ -62,26 +74,13 @@ public class AVL<T extends Comparable<T>> {
         this.eachInOrder(node.right, action);
     }
 
-    private int height(Node<T> node) {
-        if (node == null) {
-            return 0;
-        }
-
-        return node.height;
-    }
-
-    private void updateHeight(Node<T> node) {
-        node.height = Math.max(height(node.left), height(node.right)) + 1;
-    }
-
     private Node<T> rotateLeft(Node<T> node) {
         Node<T> right = node.right;
-        node.right = right.left;
+        node.right = node.right.left;
         right.left = node;
 
         this.updateHeight(node);
         this.updateHeight(right);
-
         return right;
     }
 
@@ -92,27 +91,29 @@ public class AVL<T extends Comparable<T>> {
 
         this.updateHeight(node);
         this.updateHeight(left);
-
         return left;
     }
 
     private Node<T> balance(Node<T> node) {
         int balance = this.height(node.left) - this.height(node.right);
 
-        if (balance < -1) {
+        if (balance > 1) {
+            int childBalance = this.height(node.left.left) - this.height(node.left.right);
+            if (childBalance < 0) {
+                node.left = this.rotateLeft(node.left);
+            }
+            return this.rotateRight(node);
+
+        } else if (balance < -1) {
             int childBalance = this.height(node.right.left) - this.height(node.right.right);
             if (childBalance > 0) {
                 node.right = rotateRight(node.right);
             }
             return rotateLeft(node);
-        } else if (balance > 1) {
-            int childBalance = this.height(node.left.left) - this.height(node.left.right);
-            if (childBalance < 0) {
-              node.left = this.rotateRight(node.left);
-            }
-            return this.rotateRight(node);
         }
 
         return node;
     }
+
 }
+
