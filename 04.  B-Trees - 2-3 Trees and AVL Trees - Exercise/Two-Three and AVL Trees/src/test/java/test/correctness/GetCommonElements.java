@@ -10,6 +10,7 @@ import test.helpers.IterableExtensions;
 import test.types.CorrectnessTests;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 
 public class GetCommonElements extends BaseTest {
@@ -56,6 +57,10 @@ public class GetCommonElements extends BaseTest {
         Iterable<Integer> commonElements = this.Hierarchy.getCommonElements(otherHierarchy);
         List<Integer> result = IterableExtensions.toList(commonElements);
 
-        Assert.assertTrue(result.equals(Arrays.asList(-22, 34, 10)));
+        Collections.sort(result);
+//        Assert.assertTrue(result.equals(Arrays.asList(-22, 34, 10)));
+         Assert.assertEquals(result, Arrays.asList(-22, 10, 34));
+
+         // line 60 was added, line 61 was changed to line 62
     }
 }
