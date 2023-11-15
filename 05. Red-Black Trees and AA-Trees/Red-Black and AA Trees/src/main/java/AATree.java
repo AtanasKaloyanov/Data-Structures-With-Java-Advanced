@@ -1,12 +1,12 @@
 import java.util.function.Consumer;
 
-public class RedBlackTree<T extends Comparable<T>> {
+public class AATree<T extends Comparable<T>> {
     private Node<T> root;
 
-    public RedBlackTree() {
+    public AATree() {
     }
 
-    private RedBlackTree(Node<T> node) {
+    private AATree(Node<T> node) {
         this.preOrderCopy(node);
     }
 
@@ -20,32 +20,61 @@ public class RedBlackTree<T extends Comparable<T>> {
         this.preOrderCopy(node.right);
     }
 
-    public int getNodesCount() {
-        return this.getNodesCount(this.root);
-    }
-
-    private int getNodesCount(Node<T> node) {
-        if (node == null) {
-            return 0;
-        }
-        return node.count;
-    }
-
-    // TODO:
-    //  Insert using iteration over the nodes
-    //  You can make a recursive one it is up to you
-    //  The difference is that the recursive call should
-    //  return Node
     public void insert(T value) {
+        this.root = this.insert(this.root, value);
+    }
 
+    private Node<T> insert(Node<T> node, T value) {
+        if (node == null) {
+            return new Node<>(value);
+        }
+
+        if (node.value.compareTo(value) > 0) {
+            node.left = this.insert(node.left, value);
+        } else if (node.value.compareTo(value) < 0) {
+            node.right = this.insert(node.right, value);
+        }
+
+        node = skew(node);
+        node = split(node);
+
+        return node;
+    }
+
+    private Node<T> split(Node<T> node) {
+        if (node.right == null || node.right.right == null) {
+            return node;
+        }
+
+        Node<T> result = node.right;
+        result.left = node;
+        result.right = null;
+        result.level++;
+
+        return result;
+    }
+
+    private Node<T> skew(Node<T> node) {
+        if (node.left == null) {
+            return node;
+        }
+        if (node.level == node.left.level) {
+            Node<T> result = node.left;
+            result.right = node;
+            node.left = null;
+
+            node = result;
+        }
+
+        return node;
     }
 
     public boolean contains(T value) {
         return this.findElement(value) != null;
     }
 
-    public RedBlackTree<T> search(T item) {
-        return new RedBlackTree<>(this.findElement(item));
+    public AATree<T> search(T item) {
+        return new AATree<>(this.findElement(item));
     }
 
     private Node<T> findElement(T item) {
@@ -80,8 +109,14 @@ public class RedBlackTree<T extends Comparable<T>> {
         private T value;
         private Node<T> left;
         private Node<T> right;
-        private boolean color;
-        private int count;
+        private int level;
+
+        public Node(T value) {
+            this.value = value;
+            this.level = 1;
+        }
+
     }
 }
+
 
