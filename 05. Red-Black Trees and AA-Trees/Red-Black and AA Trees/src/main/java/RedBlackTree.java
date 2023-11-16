@@ -69,7 +69,11 @@ public class RedBlackTree<T extends Comparable<T>> {
     }
 
     private boolean isRed(Node<T> node) {
-        return node == null ? false : node.isRed();
+        if (node == null) {
+            return false;
+        }
+
+        return node.isRed();
     }
 
     private Node<T> rotateLeft(Node<T> node) {
@@ -105,9 +109,9 @@ public class RedBlackTree<T extends Comparable<T>> {
     //                y                         1        x
     //             1    2                              2
     private void flipColors(Node<T> node) {
-         node.color = RED;
-         node.left.color = BLACK;
-         node.right.color = BLACK;
+        node.color = RED;
+        node.left.color = BLACK;
+        node.right.color = BLACK;
     }
 
     public boolean contains(T value) {
