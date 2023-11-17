@@ -48,12 +48,11 @@ public class AATree<T extends Comparable<T>> {
 
         Node<T> result = node.right;
         result.left = node;
-        result.right = null;
+        node.right = null;
         result.level++;
 
         return result;
     }
-
     private Node<T> skew(Node<T> node) {
         if (node.left == null) {
             return node;
@@ -111,11 +110,11 @@ public class AATree<T extends Comparable<T>> {
         private Node<T> right;
         private int level;
 
+
         public Node(T value) {
             this.value = value;
             this.level = 1;
         }
-
     }
 }
 
