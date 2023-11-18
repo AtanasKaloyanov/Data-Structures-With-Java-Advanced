@@ -127,19 +127,56 @@ public class RedBlackTree<Key extends Comparable<Key>, Value> {
     }
 
     public void deleteMin() {
+        if (this.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+        if (this.root.left == null) {
+            this.root = null;
+            return;
+        }
+
+        this.root = deleteMin(this.root);
     }
 
     // delete the key-value pair with the minimum key rooted at h
     private Node deleteMin(Node h) {
-        return null;
+        if (h.left == null) {
+            return null;
+        }
+
+        if (!isRed(h.left) && !isRed(h.left.left)) {
+            h = moveRedLeft(h);
+        }
+        h.left = deleteMin(h.left);
+        return balance(h);
     }
 
     public void deleteMax() {
+        if (this.isEmpty()) {
+            throw new IllegalArgumentException();
+        }
+        if (this.root.right == null) {
+            this.root = null;
+            return;
+        }
+
+        this.root = deleteMax(this.root);
     }
 
     // delete the key-value pair with the maximum key rooted at h
     private Node deleteMax(Node h) {
-        return null;
+        if (isRed(h.left)) {
+            h = rotateRight(h);
+        }
+        if (h.right == null) {
+            return null;
+        }
+        if (!isRed(h.right) && !isRed(h.right.right)) {
+            h = moveRedRight(h);
+        }
+
+        h.right = deleteMax(h.right);
+        return balance(h);
     }
 
     public void delete(Key key) {
@@ -155,10 +192,8 @@ public class RedBlackTree<Key extends Comparable<Key>, Value> {
         h.left = temp.right;
         temp.right = h;
 
-        h.color = RED;
-        temp.color = BLACK;
-//         temp.color = temp.right.color;
-//         temp.right.color = RED;
+        temp.color = temp.right.color;
+        temp.right.color = RED;
         temp.size = h.size;
         h.size = size(h.left) + size(h.right) + 1;
 
@@ -175,10 +210,8 @@ public class RedBlackTree<Key extends Comparable<Key>, Value> {
         h.right = temp.left;
         temp.left = h;
 
-        h.color = RED;
-        temp.color = BLACK;
-//         temp.color = temp.left.color;
-//         temp.left.color = RED;
+        temp.color = temp.left.color;
+        temp.left.color = RED;
 
         temp.size = h.size;
         h.size = size(h.left) + size(h.right) + 1;
@@ -203,44 +236,81 @@ public class RedBlackTree<Key extends Comparable<Key>, Value> {
     // Assuming that h is red and both h.left and h.left.left
     // are black, make h.left or one of its children red.
     private Node moveRedLeft(Node h) {
-        return null;
+        flipColors(h);
+        if (isRed(h.right.left)) {
+            h.right = rotateRight(h.right);
+            h = rotateLeft(h);
+            flipColors(h);
+        }
+        return h;
     }
 
     // Assuming that h is red and both h.right and h.right.left
     // are black, make h.right or one of its children red.
     private Node moveRedRight(Node h) {
-        return null;
+        flipColors(h);
+        if (isRed(h.left.left)) {
+            h.left = rotateLeft(h.left);
+            h = rotateRight(h);
+            flipColors(h);
+        }
+        return h;
     }
 
     // restore red-black tree invariant
     private Node balance(Node h) {
-        return null;
+        if (isRed(h.right)) {
+            h = rotateLeft(h);
+        }
+        if (isRed(h.left) && isRed(h.left.left)) {
+            h = rotateRight(h);
+        }
+        if (isRed(h.left) && isRed(h.right)) {
+            flipColors(h);
+        }
+
+        h.size = size(h.left) + size(h.right) + 1;
+        return h;
     }
 
     public int height() {
-        return 0;
+        return this.height(this.root);
     }
 
     private int height(Node x) {
-        return 0;
+        if (x == null) {
+            return -1;
+        }
+        return Math.max(height(x.left), height(x.right)) + 1;
     }
 
     public Key min() {
-        return null;
+        Node min = this.min(this.root);
+        return min != null ? min.key : null;
     }
 
     // the smallest key in subtree rooted at x; null if no such key
     private Node min(Node x) {
+        while (x != null) {
+            if (x.left == null) {
+                return x;
+            }
+            x = x.left;
+        }
         return null;
     }
 
     public Key max() {
-        return null;
+        Node max = this.max(this.root);
+        return max.key;
     }
 
     // the largest key in the subtree rooted at x; null if no such key
     private Node max(Node x) {
-        return null;
+        if (x.right == null) {
+            return x;
+        }
+        return max(x.right);
     }
 
     public Key floor(Key key) {
