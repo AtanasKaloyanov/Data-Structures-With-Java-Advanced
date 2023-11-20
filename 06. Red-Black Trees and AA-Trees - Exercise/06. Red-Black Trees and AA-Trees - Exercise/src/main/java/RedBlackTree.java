@@ -170,9 +170,11 @@ public class RedBlackTree<Key extends Comparable<Key>, Value> {
         if (isRed(h.left)) {
             h = rotateRight(h);
         }
+
         if (h.right == null) {
             return null;
         }
+
         if (!isRed(h.right) && !isRed(h.right.right)) {
             h = moveRedRight(h);
         }
@@ -280,7 +282,6 @@ public class RedBlackTree<Key extends Comparable<Key>, Value> {
     private Node moveRedLeft(Node h) {
         flipColors(h);
         if (isRed(h.right.left)) {
-            h.right = rotateRight(h.right);
             h = rotateLeft(h);
             flipColors(h);
         }
@@ -292,7 +293,6 @@ public class RedBlackTree<Key extends Comparable<Key>, Value> {
     private Node moveRedRight(Node h) {
         flipColors(h);
         if (isRed(h.left.left)) {
-            h.left = rotateLeft(h.left);
             h = rotateRight(h);
             flipColors(h);
         }
