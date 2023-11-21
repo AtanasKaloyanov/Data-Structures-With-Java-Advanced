@@ -32,6 +32,7 @@ class AATree<T extends Comparable<T>> {
 
     public void insert(T element) {
         this.root = this.insert(this.root, element);
+
     }
 
     private Node<T> insert(Node<T> node, T value) {
@@ -48,7 +49,7 @@ class AATree<T extends Comparable<T>> {
 
         node = skew(node);
         node = split(node);
-        node.size = size(node) + size(node) + 1;
+        node.size = size(node.left) + size(node.right) + 1;
 
         return node;
     }
@@ -64,14 +65,15 @@ class AATree<T extends Comparable<T>> {
         if (node.left == null) {
             return node;
         }
-        if (node.level == node.left.level) {
-            Node<T> result = node.left;
-            result.right = node;
-            node.left = null;
 
-            node = result;
+        if (node.level == node.left.level) {
+            Node<T> temp = node.left;
+            node.left = temp.right;
+            temp.right = node;
+            node = temp;
         }
 
+        node.size = size(node.left) + size(node.right) + 1;
         return node;
     }
 
@@ -80,15 +82,22 @@ class AATree<T extends Comparable<T>> {
             return node;
         }
 
-        Node<T> result = node.right;
-        result.left = node;
-        node.right = null;
-        result.level++;
+        if (node.level == node.right.right.level) {
+            Node<T> temp = node.right;
+            node.right = temp.left;
+            temp.left = node;
+            temp.level++;
+            node = temp;
+        }
 
-        return result;
+        node.size = size(node.left) + size(node.right) + 1;
+        return node;
     }
 
     public int countNodes() {
+        if (isEmpty()) {
+            return 0;
+        }
         return this.root.size;
     }
 
@@ -133,8 +142,8 @@ class AATree<T extends Comparable<T>> {
             return;
         }
 
-        preOrderRecc(node.left, consumer);
         consumer.accept(node.value);
+        preOrderRecc(node.left, consumer);
         preOrderRecc(node.right, consumer);
     }
 
@@ -148,8 +157,8 @@ class AATree<T extends Comparable<T>> {
         }
 
         postOrderRecc(node.left, consumer);
-        consumer.accept(node.value);
         postOrderRecc(node.right, consumer);
+        consumer.accept(node.value);
     }
 }
 
