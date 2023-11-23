@@ -39,15 +39,13 @@ public class HashTable<K, V> implements Iterable<KeyValue<K, V>> {
     }
 
     private int findSlotNumber(K key) {
-        return Math.abs(key.hashCode()) % this.capacity;
+        return Math.abs(key.hashCode()) % this.slots.length;
     }
-
     private void growIfNeeded() {
         if (( (double) this.count + 1) / this.capacity > LOAD_FACTOR) {
             this.grow();
         }
     }
-
     private void grow() {
         HashTable<K, V> newTable = new HashTable<>(this.capacity * 2);
 
@@ -71,6 +69,7 @@ public class HashTable<K, V> implements Iterable<KeyValue<K, V>> {
 
     public boolean addOrReplace(K key, V value) {
         this.growIfNeeded();
+
         int index = findSlotNumber(key);
 
         LinkedList<KeyValue<K, V>> list = this.slots[index];
@@ -94,6 +93,7 @@ public class HashTable<K, V> implements Iterable<KeyValue<K, V>> {
         }
 
         this.slots[index] = list;
+
         return updated;
     }
 
@@ -178,8 +178,10 @@ public class HashTable<K, V> implements Iterable<KeyValue<K, V>> {
     public Iterator<KeyValue<K, V>> iterator() {
         return new HashIterator();
     }
+
     private class HashIterator implements Iterator<KeyValue<K, V>> {
         Deque<KeyValue<K, V>> elements;
+
         HashIterator() {
             this.elements = new ArrayDeque<>();
 
