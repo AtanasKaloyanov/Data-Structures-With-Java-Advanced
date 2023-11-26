@@ -82,6 +82,7 @@ public class Battlecard implements Comparable<Battlecard> {
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, type, name, damage, swag);
+        int prime = 73;
+        return Objects.hash(id, type, name, damage, swag) * prime;
     }
 }
