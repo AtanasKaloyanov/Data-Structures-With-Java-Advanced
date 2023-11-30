@@ -13,7 +13,7 @@ public class ShoppingCentre {
 
     public String delete(String name, String producer) {
         int oldProductsNumber = this.products.size();
-        this.products.removeIf((product) -> product.getName().equals(name)
+        this.products.removeIf( (product) -> product.getName().equals(name)
                 && product.getProducer().equals(producer));
         int difference = oldProductsNumber - this.products.size();
         return difference == 0 ? "No products found" + "\n" : String.format("%d products deleted" + "\n", difference);
@@ -32,7 +32,7 @@ public class ShoppingCentre {
         this.products
                 .stream()
                 .filter((product -> product.getName().equals(name)))
-                .forEach((product) -> sb.append(product).append(System.lineSeparator()));
+                .forEach((product) -> sb.append(product).append("\n"));
 
         String result = sb.toString();
         return result.length() == 0 ? "No products found" + "\n" : result;
@@ -44,7 +44,7 @@ public class ShoppingCentre {
         this.products
                 .stream()
                 .filter( (product) -> product.getProducer().equals(producer))
-                .forEach((product) -> sb.append(product).append(System.lineSeparator()));
+                .forEach((product) -> sb.append(product).append("\n"));
 
         String result = sb.toString();
         return result.length() == 0 ? "No products found" + "\n" : result;
@@ -56,7 +56,7 @@ public class ShoppingCentre {
         this.products
                 .stream()
                 .filter( (product) -> product.getPrice() >= priceFrom && product.getPrice() <= priceTo)
-                .forEach( (product) -> sb.append(product).append(System.lineSeparator()));
+                .forEach( (product) -> sb.append(product).append("\n"));
 
         String result = sb.toString();
         return result.length() == 0 ? "No products found" + "\n" : result;
