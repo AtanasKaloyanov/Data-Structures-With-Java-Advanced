@@ -3,13 +3,17 @@ package core;
 import models.Package;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class PackageManagerImpl implements PackageManager {
-    private Map<String, Package> packagesById = new HashMap<>();
+    private Map<String, Package> packagesById = new LinkedHashMap<>();
+    private Map<String, Package> packagesByNameAndVersion = new LinkedHashMap<>();
+    private Map<String, Set<Package>> dependenciesByParentId = new LinkedHashMap<>();
+    private Set<Package> independentPackages = new TreeSet<>(Comparator.comparing(
+            Package::getReleaseDate).reversed()
+            .thenComparing(Package::getVersion));
 
-    private Map<String, Package> packagesByNameAndVersion = new HashMap<>();
-
-    private Map<String, TreeSet<Package>> dependenciesByParentId = new LinkedHashMap<>();
+    private Map<String, Package> packagesByname = new LinkedHashMap<>();
 
     @Override
     public void registerPackage(Package _package) {
@@ -20,6 +24,16 @@ public class PackageManagerImpl implements PackageManager {
 
         this.packagesById.put(_package.getId(), _package);
         this.packagesByNameAndVersion.put(nameAndVersion, _package);
+        //
+        this.independentPackages.add(_package);
+
+        if (this.packagesByname.containsKey(_package.getName())) {
+            if (_package.getName().compareTo(this.packagesByname.get(_package.getName()).getName()) > 0) {
+                this.packagesByname.put(_package.getName(), _package);
+            }
+        } else {
+            this.packagesByname.put(_package.getName(), _package);
+        }
     }
 
     @Override
@@ -30,8 +44,14 @@ public class PackageManagerImpl implements PackageManager {
 
         Package _package = this.packagesById.remove(packageId);
         this.packagesByNameAndVersion.remove(_package.getName() + "-" + _package.getVersion());
-        this.dependenciesByParentId.put(packageId, new TreeSet<>(Comparator.comparing(Package::getReleaseDate).reversed()
-                .thenComparing(Package::getVersion)));
+
+        this.dependenciesByParentId.entrySet().forEach( (entry) -> {
+            Set<Package> currentSet = entry.getValue();
+            currentSet.remove(_package);
+        });
+        //
+        this.independentPackages.remove(_package);
+        this.packagesByname.remove(_package.getName());
     }
 
     @Override
@@ -41,13 +61,16 @@ public class PackageManagerImpl implements PackageManager {
             throw new IllegalArgumentException();
         }
 
-        if (this.dependenciesByParentId.get(packageId) == null) {
-            this.dependenciesByParentId.put(packageId, new TreeSet<>(
-                    Comparator.comparing(Package::getReleaseDate).reversed()
-                    .thenComparing(Package::getVersion)));
-        }
+        Package bossPackage = this.packagesById.get(packageId);
         Package dependency = this.packagesById.get(dependencyId);
+
+        if (this.dependenciesByParentId.get(packageId) == null) {
+            this.dependenciesByParentId.put(packageId, new LinkedHashSet<>());
+        }
+
         this.dependenciesByParentId.get(packageId).add(dependency);
+        //
+        this.independentPackages.remove(bossPackage);
     }
 
     @Override
@@ -67,11 +90,15 @@ public class PackageManagerImpl implements PackageManager {
 
     @Override
     public Iterable<Package> getIndependentPackages() {
-        return null;
+        return this.independentPackages;
     }
 
     @Override
     public Iterable<Package> getOrderedPackagesByReleaseDateThenByVersion() {
-        return null;
+        return this.packagesByname.values()
+                .stream()
+                .sorted(Comparator.comparing(Package::getReleaseDate).reversed()
+                        .thenComparing(Package::getVersion))
+                .collect(Collectors.toList());
     }
 }

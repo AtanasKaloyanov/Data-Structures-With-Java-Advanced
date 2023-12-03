@@ -70,20 +70,20 @@ public class ExpressionistImpl implements Expressionist {
                 expression.setLeftChild(expression.getRightChild());
                 expression.setRightChild(null);
                 flag = true;
-                removeChildren(removed);
             } else if (expression.getRightChild().equals(removed)) {
                 expression.setRightChild(null);
                 flag = true;
             }
+
             if (flag) {
-                return;
+                break;
             }
         }
-        removeChildren(removed);
 
+        removeChildrenBFS(removed);
     }
 
-    private void removeChildren(Expression removed) {
+    private void removeChildrenBFS(Expression removed) {
         ArrayDeque<Expression> deque = new ArrayDeque<>();
         deque.offer(removed);
 
@@ -116,7 +116,14 @@ public class ExpressionistImpl implements Expressionist {
         if (node.getType().equals(ExpressionType.VALUE)) {
             sb.append(node.getValue());
         } else if (node.getType().equals(ExpressionType.OPERATOR)) {
-
+            String r = "("
+                    + node.getLeftChild().getValue()
+                    + " "
+                    + node.getValue()
+                    + " "
+                    + node.getRightChild().getValue()
+                    + ")";
+            sb.append(r);
         }
 
         inOrder(node.getRightChild(), sb);
