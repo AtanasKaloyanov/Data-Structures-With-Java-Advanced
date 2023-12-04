@@ -1,156 +1,132 @@
+
 package core;
 
 import models.Expression;
 import models.ExpressionType;
 
-import java.util.*;
+import java.util.ArrayDeque;
+import java.util.HashMap;
+import java.util.Map;
 
 public class ExpressionistImpl implements Expressionist {
-    private final Map<String, Expression> expressionById;
-
-    public ExpressionistImpl() {
-        this.expressionById = new TreeMap<>();
-    }
+    private Map<String, Expression> expressionsById = new HashMap<>();
+    private Expression root;
 
     @Override
     public void addExpression(Expression expression) {
-        if (!this.expressionById.isEmpty()) {
+        if (!this.expressionsById.isEmpty()) {
             throw new IllegalArgumentException();
         }
 
-        this.expressionById.put(expression.getId(), expression);
+        this.root = expression;
+        this.expressionsById.put(expression.getId(), expression);
     }
 
     @Override
     public void addExpression(Expression expression, String parentId) {
-        Expression currentParentExpr = this.expressionById.get(parentId);
-
-        if (currentParentExpr == null) {
+        Expression parent = this.expressionsById.get(parentId);
+        if (parent == null) {
             throw new IllegalArgumentException();
         }
 
-        if (currentParentExpr.getLeftChild() == null) {
-            currentParentExpr.setLeftChild(expression);
-            this.expressionById.put(expression.getId(), expression);
-        } else if (currentParentExpr.getRightChild() == null){
-            currentParentExpr.setRightChild(expression);
-            this.expressionById.put(expression.getId(), expression);
-        } else {
+        if (parent.getLeftChild() == null) {
+            parent.setLeftChild(expression);
+        } else if (parent.getLeftChild() != null && parent.getRightChild() == null) {
+            parent.setRightChild(expression);
+        } else if (parent.getLeftChild() != null && parent.getRightChild() != null) {
             throw new IllegalArgumentException();
         }
+
+        this.expressionsById.put(expression.getId(), expression);
     }
 
     @Override
     public boolean contains(Expression expression) {
-        return this.expressionById.containsValue(expression);
+        return this.expressionsById.containsKey(expression.getId());
     }
 
     @Override
     public int size() {
-        return this.expressionById.size();
+        return this.expressionsById.size();
     }
 
     @Override
     public Expression getExpression(String expressionId) {
-        Expression result = this.expressionById.get(expressionId);
-
-        if (result == null) {
+        if (!this.expressionsById.containsKey(expressionId)) {
             throw new IllegalArgumentException();
         }
-
-        return result;
+        return this.expressionsById.get(expressionId);
     }
 
     @Override
     public void removeExpression(String expressionId) {
-        Expression result = this.expressionById.get(expressionId);
-
-        if (result == null) {
+        if (!this.expressionsById.containsKey(expressionId)) {
             throw new IllegalArgumentException();
         }
+        Expression removed = this.expressionsById.remove(expressionId);
+        boolean flag = false;
 
-        for (Expression value : this.expressionById.values()) {
-            Expression root = value;
-
-            boolean flag = false;
-
-            if (value.getLeftChild() == result) {
-                removeExpr(result);
-
-                root.setLeftChild(root.getRightChild());
-                root.setRightChild(null);
-
+        for (Expression expression : this.expressionsById.values()) {
+            if (expression.getLeftChild().equals(removed)) {
+                expression.setLeftChild(expression.getRightChild());
+                expression.setRightChild(null);
                 flag = true;
-            } else if (value.getRightChild() == result) {
-                removeExpr(result);
-
-                root.setRightChild(null);
-
+            } else if (expression.getRightChild().equals(removed)) {
+                expression.setRightChild(null);
                 flag = true;
             }
 
             if (flag) {
-                return;
+                break;
             }
-
         }
+
+        removeChildrenBFS(removed);
     }
 
-    public void removeExpr (Expression expression) {
+    private void removeChildrenBFS(Expression removed) {
+        ArrayDeque<Expression> deque = new ArrayDeque<>();
+        deque.offer(removed);
 
-        if (expression.getLeftChild() != null) {
-            this.removeExpr(expression.getLeftChild());
-            expression.setLeftChild(null);
+        while (!deque.isEmpty()) {
+            Expression current = deque.poll();
+            this.expressionsById.remove(current.getId());
+
+            if (current.getLeftChild() != null) {
+                deque.offer(current.getLeftChild());
+            }
+            if (current.getRightChild() != null) {
+                deque.offer(current.getRightChild());
+            }
         }
-
-        if (expression.getRightChild() != null) {
-            this.removeExpr(expression.getRightChild());
-            expression.setRightChild(null);
-        }
-
-        this.expressionById.remove(expression.getId());
     }
 
     @Override
     public String evaluate() {
-        Expression root = findRoot();
-
-        return goDeap(root);
-    }
-
-    private Expression findRoot() {
-        Expression root = new Expression();
-
-        for (Expression value : this.expressionById.values()) {
-            root = value;
-            break;
-        }
-
-        return root;
-    }
-
-    private String goDeap(Expression root) {
         StringBuilder sb = new StringBuilder();
-
-        Expression leftChild = root.getLeftChild();//10
-        Expression rightChild = root.getRightChild();//30
-
-        if (leftChild.getLeftChild() != null) {
-            goDeap(leftChild);
-        }
-
-        String rootType = root.getType().toString();
-        String rootValue = root.getValue();
-        String leftChildValue = leftChild.getValue();
-        String rightChildValue = rightChild.getValue();
-
-        if (rootType.equals("Value")) {
-            sb.append(rootValue);
-        } else {
-            sb.append(String.format("(%s %s %s)", leftChildValue, rootValue, rightChildValue));
-        }
-
-
+        inOrder(this.root, sb);
         return sb.toString();
+    }
+
+    private void inOrder(Expression node, StringBuilder sb) {
+        if (node == null) {
+            return;
+        }
+
+        inOrder(node.getLeftChild(), sb);
+        if (node.getType().equals(ExpressionType.VALUE)) {
+            sb.append(node.getValue());
+        } else if (node.getType().equals(ExpressionType.OPERATOR)) {
+            String r = "("
+                    + node.getLeftChild().getValue()
+                    + " "
+                    + node.getValue()
+                    + " "
+                    + node.getRightChild().getValue()
+                    + ")";
+            sb.append(r);
+        }
+
+        inOrder(node.getRightChild(), sb);
     }
 }

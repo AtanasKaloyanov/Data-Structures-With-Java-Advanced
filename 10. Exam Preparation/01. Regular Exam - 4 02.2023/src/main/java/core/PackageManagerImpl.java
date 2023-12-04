@@ -2,131 +2,100 @@ package core;
 
 import models.Package;
 
-import java.time.LocalDateTime;
 import java.util.*;
 import java.util.stream.Collectors;
 
 public class PackageManagerImpl implements PackageManager {
-    private final Map<String, Package> packageById;
+    private Map<String, Package> packagesById = new LinkedHashMap<>();
+    private Map<String, Package> packagesByNameAndVersion = new LinkedHashMap<>();
+    private Map<String, Set<Package>> dependenciesByParentId = new LinkedHashMap<>();
+    private Set<Package> independentPackages = new TreeSet<>(Comparator.comparing(
+                    Package::getReleaseDate).reversed()
+            .thenComparing(Package::getVersion));
 
-    private final Set<Package> packages;
-
-    private final Map<Package, List<Package>> dependencies;
-
-    public PackageManagerImpl() {
-        this.packageById = new LinkedHashMap<>();
-
-        this.packages = new LinkedHashSet<>();
-
-        this.dependencies = new LinkedHashMap<>();
-    }
+    private Map<String, Package> packagesByname = new LinkedHashMap<>();
 
     @Override
     public void registerPackage(Package _package) {
-        if (!this.packages.isEmpty()) {
-            String name = _package.getName();
-            String version = _package.getVersion();
-
-            List<Package> collect = this.packages
-                    .stream()
-                    .filter(p -> p.getName().equals(name)
-                            && p.getVersion().equals(version))
-                    .collect(Collectors.toList());
-
-            if (collect.size() != 0) {
-                throw new IllegalArgumentException();
-            }
+        String nameAndVersion = _package.getName() + "-" + _package.getVersion();
+        if (this.packagesByNameAndVersion.containsKey(nameAndVersion)) {
+            throw new IllegalArgumentException();
         }
 
-        this.packageById.put(_package.getId(), _package);
-        this.packages.add(_package);
+        this.packagesById.put(_package.getId(), _package);
+        this.packagesByNameAndVersion.put(nameAndVersion, _package);
+        this.independentPackages.add(_package);
+
+        if (this.packagesByname.containsKey(_package.getName())) {
+            if (_package.getName().compareTo(this.packagesByname.get(_package.getName()).getName()) > 0) {
+                this.packagesByname.put(_package.getName(), _package);
+            }
+        } else {
+            this.packagesByname.put(_package.getName(), _package);
+        }
     }
 
     @Override
     public void removePackage(String packageId) {
-        Package result = this.packageById.remove(packageId);
-
-        if (result == null) {
+        if (!this.packagesById.containsKey(packageId)) {
             throw new IllegalArgumentException();
         }
 
-        this.packages.remove(result);
-        this.dependencies.remove(result);
+        Package _package = this.packagesById.remove(packageId);
+        this.packagesByNameAndVersion.remove(_package.getName() + "-" + _package.getVersion());
+
+        this.dependenciesByParentId.entrySet().forEach( (entry) -> {
+            Set<Package> currentSet = entry.getValue();
+            currentSet.remove(_package);
+        });
+        this.independentPackages.remove(_package);
+        this.packagesByname.remove(_package.getName());
     }
 
     @Override
     public void addDependency(String packageId, String dependencyId) {
-        Package mainPack = this.packageById.get(packageId);
-        Package depPack = this.packageById.get(dependencyId);
-        if (mainPack == null || depPack == null) {
+        if (!this.packagesById.containsKey(packageId)
+                || !this.packagesById.containsKey(dependencyId)) {
             throw new IllegalArgumentException();
         }
 
-        if (!this.dependencies.containsKey(mainPack)) {
-            this.dependencies.put(mainPack, new ArrayList<>());
+        Package dependency = this.packagesById.get(dependencyId);
+        Package bossPackage = this.packagesById.get(packageId);
+
+        if (this.dependenciesByParentId.get(packageId) == null) {
+            this.dependenciesByParentId.put(packageId, new LinkedHashSet<>());
         }
 
-        List<Package> packages = this.dependencies.get(mainPack);
-        packages.add(depPack);
-        this.dependencies.put(mainPack, packages);
-
+        this.dependenciesByParentId.get(packageId).add(dependency);
+        this.independentPackages.remove(bossPackage);
     }
 
     @Override
     public boolean contains(Package _package) {
-        return this.packages.contains(_package);
+        return this.packagesById.containsKey(_package.getId());
     }
 
     @Override
     public int size() {
-        return this.packages.size();
+        return this.packagesById.size();
     }
 
     @Override
     public Iterable<Package> getDependants(Package _package) {
-        List<Package> packages = this.dependencies.get(_package);
-
-        if (packages == null) {
-            return Collections.emptyList();
-        }
-
-        return packages;
+        return this.dependenciesByParentId.get(_package.getId());
     }
 
     @Override
     public Iterable<Package> getIndependentPackages() {
-        return this.packages.stream()
-                .filter(p -> {
-                    return !this.dependencies.containsKey(p);
-                })
-                .sorted((l, r) -> {
-                    LocalDateTime leftReleaseDate = l.getReleaseDate();
-                    LocalDateTime rightReleaseDate = r.getReleaseDate();
-
-
-                    if (leftReleaseDate != rightReleaseDate) {
-                        return rightReleaseDate.compareTo(leftReleaseDate);
-                    }
-
-                    return l.getVersion().compareTo(r.getVersion());
-                })
-                .collect(Collectors.toList());
+        return this.independentPackages;
     }
 
     @Override
     public Iterable<Package> getOrderedPackagesByReleaseDateThenByVersion() {
-        return this.packageById.values()
+        return this.packagesByname.values()
                 .stream()
-                .sorted((l, r) -> {
-                    LocalDateTime leftDate = l.getReleaseDate();
-                    LocalDateTime rightDate = r.getReleaseDate();
-
-                    if (leftDate != rightDate) {
-                        return rightDate.compareTo(leftDate);
-                    } else {
-                        return l.getVersion().compareTo(r.getVersion());
-                    }
-                })
+                .sorted(Comparator.comparing(Package::getReleaseDate).reversed()
+                        .thenComparing(Package::getVersion))
                 .collect(Collectors.toList());
     }
 }
