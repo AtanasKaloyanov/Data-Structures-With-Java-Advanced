@@ -11,7 +11,6 @@ public class Category {
     private String name;
 
     private String description;
-    private Set<Category> children = new LinkedHashSet<>();
 
     public Category(String id, String name, String description) {
         this.id = id;
@@ -43,11 +42,5 @@ public class Category {
         this.description = description;
     }
 
-    public Set<Category> getChildren() {
-        return children;
-    }
 
-    public void setChildren(Set<Category> children) {
-        this.children = children;
-    }
 }

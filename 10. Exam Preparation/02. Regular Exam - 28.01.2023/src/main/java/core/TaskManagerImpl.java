@@ -6,18 +6,14 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 public class TaskManagerImpl implements TaskManager {
-    private Map<String, Task> tasksById = new LinkedHashMap<>();
-    private Queue<Task> executableTask = new ArrayDeque<>();
+    private LinkedHashMap<String, Task> tasksById = new LinkedHashMap<>();
+    private LinkedHashSet<Task> pendingTasks = new LinkedHashSet<>();
     private Map<String, Task> executedTasks = new LinkedHashMap<>();
-    private Map<String, Set<Task>> tasksByDomain = new LinkedHashMap<>();
 
     @Override
     public void addTask(Task task) {
         this.tasksById.put(task.getId(), task);
-        this.executableTask.offer(task);
-        // by Domain
-        this.tasksByDomain.putIfAbsent(task.getDomain(), new LinkedHashSet<>());
-        this.tasksByDomain.get(task.getDomain()).add(task);
+        this.pendingTasks.add(task);
     }
 
     @Override
@@ -27,41 +23,39 @@ public class TaskManagerImpl implements TaskManager {
 
     @Override
     public int size() {
-        return this.tasksById.size();
+        return this.pendingTasks.size();
     }
 
     @Override
     public Task getTask(String taskId) {
-        if (!this.tasksById.containsKey(taskId)) {
+        Task task = this.tasksById.get(taskId);
+        if (task == null) {
             throw new IllegalArgumentException();
         }
-
-        return this.tasksById.get(taskId);
+        return task;
     }
 
     @Override
     public void deleteTask(String taskId) {
-        if (!this.tasksById.containsKey(taskId)) {
+        Task removedTask = this.tasksById.remove(taskId);
+        if (removedTask == null) {
             throw new IllegalArgumentException();
         }
-
-        Task removedTask = this.tasksById.remove(taskId);
-        this.executableTask.removeIf(task -> task.getId().equals(taskId));
+        this.pendingTasks.remove(removedTask);
         this.executedTasks.remove(taskId);
-        this.tasksByDomain.get(removedTask.getDomain()).remove(removedTask);
     }
 
     @Override
     public Task executeTask() {
-        Task firstTask = this.executableTask.poll();
-        if (firstTask == null) {
+        if (this.pendingTasks.isEmpty()) {
             throw new IllegalArgumentException();
         }
+        Iterator<Task> iterator = this.pendingTasks.iterator();
+        Task first = iterator.next();
+        iterator.remove();
 
-        this.tasksById.remove(firstTask.getId());
-        this.executedTasks.put(firstTask.getId(), firstTask);
-        this.tasksByDomain.get(firstTask.getDomain()).remove(firstTask);
-        return firstTask;
+        this.executedTasks.put(first.getId(), first);
+        return first;
     }
 
     @Override
@@ -70,25 +64,26 @@ public class TaskManagerImpl implements TaskManager {
         if (changedTask == null) {
             throw new IllegalArgumentException();
         }
-        this.tasksById.put(changedTask.getId(), changedTask);
-        this.executableTask.offer(changedTask);
-        this.tasksByDomain.get(changedTask.getDomain()).add(changedTask);
+        this.pendingTasks.add(changedTask);
     }
 
     @Override
     public Iterable<Task> getDomainTasks(String domain) {
-        Set<Task> tasks = this.tasksByDomain.get(domain);
-        if (tasks == null) {
+        List<Task> result = this.pendingTasks.stream()
+                .filter((task) -> task.getDomain().equals(domain))
+                .collect(Collectors.toList());
+
+        if (result.isEmpty()) {
             throw new IllegalArgumentException();
         }
-        return tasks;
+        return result;
     }
 
     @Override
     public Iterable<Task> getTasksInEETRange(int lowerBound, int upperBound) {
-        return this.executableTask.stream()
-                .filter( (task) -> task.getEstimatedExecutionTime() <= lowerBound
-                        && task.getEstimatedExecutionTime() >= upperBound)
+        return this.pendingTasks.stream()
+                .filter((task) -> task.getEstimatedExecutionTime() >= lowerBound
+                        && task.getEstimatedExecutionTime() <= upperBound)
                 .collect(Collectors.toList());
     }
 
@@ -97,7 +92,8 @@ public class TaskManagerImpl implements TaskManager {
         return this.tasksById.values()
                 .stream()
                 .sorted(Comparator.comparing(Task::getEstimatedExecutionTime).reversed()
-                        .thenComparing(Task::getName))
+                        //  .sorted(Comparator.comparing(Task::getEstimatedExecutionTime, Comparator.reverseOrder())
+                        .thenComparing(task -> task.getName().length()))
                 .collect(Collectors.toList());
     }
 }
