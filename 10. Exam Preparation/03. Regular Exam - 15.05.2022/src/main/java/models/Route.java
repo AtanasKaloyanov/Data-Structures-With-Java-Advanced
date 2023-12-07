@@ -63,9 +63,7 @@ public class Route {
         this.locationPoints = locationPoints;
     }
 
-    public int getLocationPointsNumber() {
-        return this.locationPoints.size();
-    }
+
 
     @Override
     public boolean equals(Object o) {

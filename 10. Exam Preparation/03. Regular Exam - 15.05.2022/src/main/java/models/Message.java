@@ -61,4 +61,9 @@ public class Message {
     public void setReactions(List<String> reactions) {
         this.reactions = reactions;
     }
+
+    @Override
+    public String toString() {
+        return this.id;
+    }
 }

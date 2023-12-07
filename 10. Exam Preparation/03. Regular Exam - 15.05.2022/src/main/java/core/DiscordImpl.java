@@ -10,7 +10,7 @@ public class DiscordImpl implements Discord {
 
     @Override
     public void sendMessage(Message message) {
-        messagesById.put(message.getId(), message);
+        this.messagesById.put(message.getId(), message);
     }
 
     @Override
@@ -42,10 +42,11 @@ public class DiscordImpl implements Discord {
 
     @Override
     public void reactToMessage(String messageId, String reaction) {
-        if (!this.messagesById.containsKey(messageId)) {
+        Message message = this.messagesById.get(messageId);
+        if (message == null) {
             throw new IllegalArgumentException();
         }
-        this.messagesById.get(messageId).getReactions().add(reaction);
+        message.getReactions().add(reaction);
     }
 
     @Override
@@ -62,7 +63,15 @@ public class DiscordImpl implements Discord {
 
     @Override
     public Iterable<Message> getMessagesByReactions(List<String> reactions) {
-        return new ArrayList<>();
+       return this.messagesById.values()
+                .stream()
+                .filter( (message) -> {
+                    List<String> reactS = message.getReactions();
+                    return new HashSet<>(reactS).containsAll(reactions);
+                })
+               .sorted(Comparator.comparing( (Message m) -> m.getReactions().size(), Comparator.reverseOrder())
+                       .thenComparing(Message::getTimestamp))
+                .collect(Collectors.toList());
     }
 
     @Override
@@ -70,11 +79,7 @@ public class DiscordImpl implements Discord {
         return this.messagesById.values()
                 .stream()
                 .filter((message) -> message.getTimestamp() >= lowerBound && message.getTimestamp() <= upperBound)
-                .sorted((first, second) -> {
-                    int firstResult = first.getReactions().size();
-                    int secondResult = second.getReactions().size();
-                    return Integer.compare(secondResult, firstResult);
-                })
+                .sorted(Comparator.comparing( (Message m) -> m.getChannel().length()).reversed())
                 .collect(Collectors.toList());
     }
 
@@ -82,11 +87,8 @@ public class DiscordImpl implements Discord {
     public Iterable<Message> getTop3MostReactedMessages() {
         return this.messagesById.values()
                 .stream()
-                .sorted((first, second) -> {
-                    int firstResult = first.getReactions().size();
-                    int secondResult = second.getReactions().size();
-                    return Integer.compare(secondResult, firstResult);
-                }).limit(3)
+                .sorted(Comparator.comparing((Message m) -> m.getReactions().size()).reversed())
+                .limit(3)
                 .collect(Collectors.toList());
     }
 
@@ -94,23 +96,9 @@ public class DiscordImpl implements Discord {
     public Iterable<Message> getAllMessagesOrderedByCountOfReactionsThenByTimestampThenByLengthOfContent() {
         return this.messagesById.values()
                 .stream()
-                .sorted((first, second) -> {
-                    int firstResult = first.getReactions().size();
-                    int secondResult = second.getReactions().size();
-                    int result = Integer.compare(secondResult, firstResult);
-
-                    if (result == 0) {
-                        result = Integer.compare(first.getTimestamp(),
-                                second.getTimestamp());
-                    }
-
-                    if (result == 0) {
-                      result = Integer.compare(first.getContent().length(),
-                              second.getContent().length());
-                    }
-                    return result;
-                })
-
+                .sorted(Comparator.comparing( (Message m) -> m.getReactions().size(), Comparator.reverseOrder())
+                        .thenComparing(Message::getTimestamp)
+                        .thenComparing( (message) -> message.getContent().length()))
                 .collect(Collectors.toList());
     }
 }

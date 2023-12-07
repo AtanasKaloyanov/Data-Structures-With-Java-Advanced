@@ -112,6 +112,7 @@ public class DiscordTests {
         assertEquals(Message3, messages.get(0));
         assertEquals(Message, messages.get(1));
         assertEquals(Message2, messages.get(2));
+
     }
 
     @Test
