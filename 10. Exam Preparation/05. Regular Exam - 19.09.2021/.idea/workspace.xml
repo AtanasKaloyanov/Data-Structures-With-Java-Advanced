@@ -26,12 +26,15 @@
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "WebServerToolWindowFactoryState": "false",
-    "last_opened_file_path": "D:/Programming/Projects/Java Data Structures Fundamentals/05. Exam Preparation/01. Retake Exam - 18.12.2022/ViTube and Movie",
+    "last_opened_file_path": "D:/Programming/Projects/Java Data Structures Advanced/10. Exam Preparation/04. Retake Exam - 26.09.2021",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
+    "project.structure.last.edited": "Project",
+    "project.structure.proportion": "0.0",
+    "project.structure.side.proportion": "0.0",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
@@ -126,6 +129,7 @@
       <workItem from="1701984992223" duration="8870000" />
       <workItem from="1702041865526" duration="306000" />
       <workItem from="1702042189049" duration="20871000" />
+      <workItem from="1702065466505" duration="56000" />
     </task>
     <servers />
   </component>
